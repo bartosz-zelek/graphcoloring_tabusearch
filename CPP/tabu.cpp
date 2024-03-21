@@ -46,12 +46,9 @@ std::vector<std::vector<int>> tabu_search(MatrixGraph G, int k_number_of_colours
         bool so_far_best_solution_found = false;
         if (tabu.size() > tabu_size)
         {
-            //tabu.erase(std::remove(tabu.begin(), tabu.end(), tabu[0]), tabu.end());
+            // tabu.erase(std::remove(tabu.begin(), tabu.end(), tabu[0]), tabu.end());
             tabu.pop_back();
         }
-
-        
-        
 
         std::vector<std::vector<int>> best_proposed_solution;
         int best_conflicts_count;
@@ -83,7 +80,7 @@ std::vector<std::vector<int>> tabu_search(MatrixGraph G, int k_number_of_colours
                 }
 
                 std::pair<int, int> m{vertex, colour};
-                for (auto el:tabu)
+                for (auto el : tabu)
                 {
                     if (el == m)
                     {
@@ -91,9 +88,7 @@ std::vector<std::vector<int>> tabu_search(MatrixGraph G, int k_number_of_colours
                         break;
                     }
                 }
-            }
-            while (in_tabu);
-            
+            } while (in_tabu);
 
             std::vector<std::vector<int>> proposed_solution = solution;
             proposed_solution[colour].push_back(vertex); // Add vertex to its new colour
@@ -130,7 +125,6 @@ std::vector<std::vector<int>> tabu_search(MatrixGraph G, int k_number_of_colours
             solution = best_proposed_solution; // Todo - best proposed solutions conflicts, optymalizacja
         }
     }
-
 
     if (solution_found)
     {

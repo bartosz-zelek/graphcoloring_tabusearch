@@ -1,5 +1,6 @@
 #include "MatrixGraph.h"
 #include "tabu_search.h"
+#include "omp.h"
 
 #include <cstdlib>
 #include <algorithm>
@@ -46,9 +47,11 @@ std::vector<std::vector<int>> greedy_coloring(MatrixGraph &G)
         nodes_degrees[i] = G.get_neighbours(i).size();
     }
     std::sort(nodes_degrees.begin(), nodes_degrees.end(), std::greater<int>());
-    std::sort(nodes.begin(), nodes.end(), [&nodes_degrees](int a, int b) { return nodes_degrees[a] > nodes_degrees[b]; });
+    // set nodes in descending order of degrees
+    std::sort(nodes.begin(), nodes.end(), [&nodes_degrees](int a, int b)
+              { return nodes_degrees[a] > nodes_degrees[b]; });
     int greedy_coloring_count = 0;
-    for (int i: nodes)
+    for (int i : nodes)
     {
         for (int j = 0; j < g_size; j++)
         {
@@ -86,7 +89,7 @@ std::vector<std::vector<int>> greedy_coloring(MatrixGraph &G)
             }
         }
     }
-    return std::vector<std::vector<int>> (colours.begin(), colours.begin() + greedy_coloring_count);
+    return std::vector<std::vector<int>>(colours.begin(), colours.begin() + greedy_coloring_count);
 }
 
 int main(int argc, char *argv[])
@@ -96,26 +99,26 @@ int main(int argc, char *argv[])
     // {
     //     k = std::atoi(argv[1]);
     // }
-   // printf("%d\n", argc);
-    std::string file_path = "gc1000.txt";
+    // printf("%d\n", argc);
+    std::string file_path = "../instances/mycie14.txt";
     int number_of_neighbours = 50;
     int number_of_iterations = 500000;
     if (argc == 2)
     {
         file_path = argv[1];
-        //printf("%d\n", argc);
+        // printf("%d\n", argc);
     }
     else if (argc == 4)
     {
         file_path = argv[1];
         number_of_neighbours = std::atoi(argv[2]);
         number_of_iterations = std::atoi(argv[3]);
-        //printf("%d\n", argc);
+        // printf("%d\n", argc);
     }
-    
-   // printf("%d\n", argc);
+
+    // printf("%d\n", argc);
     MatrixGraph G = MatrixGraph::get_graph_from_instance_file(file_path, false);
-    //G.print_graph_to_file();
+    // G.print_graph_to_file();
 
     std::string f_out;
     bool double_dot_found = false;
@@ -126,7 +129,7 @@ int main(int argc, char *argv[])
             f_out += file_path[i];
             double_dot_found = false;
         }
-        else if (file_path[i+1] == '.')
+        else if (file_path[i + 1] == '.')
         {
             f_out += file_path[i];
             double_dot_found = true;
@@ -147,21 +150,22 @@ int main(int argc, char *argv[])
     std::vector<std::vector<int>> r;
     std::vector<std::vector<int>> sol = greedy_coloring(G);
 
-    //f.open(f_out);                  // Print greedy solution
+    // f.open(f_out);                  // Print greedy solution
     print_sol_to_file(sol, f);
     f.close();
 
-    //auto start = std::chrono::high_resolution_clock::now();
-    for(int greedy_count = sol.size()-1; greedy_count > 1; greedy_count--)
+    // auto start = std::chrono::high_resolution_clock::now();
+    for (int greedy_count = sol.size() - 1; greedy_count > 1; greedy_count--)
     {
         auto temp = sol;
-        auto min = std::min_element(temp.begin(), temp.end(), [](const auto &a, const auto &b){return a.size() < b.size();});
-        std::iter_swap(min, temp.end()-1);
-        for(int i = 0; i < temp[temp.size() - 1].size(); i++)
+        auto min = std::min_element(temp.begin(), temp.end(), [](const auto &a, const auto &b)
+                                    { return a.size() < b.size(); }); // Find the smallest colour class
+        std::iter_swap(min, temp.end() - 1);                          // smallest colour class goes at the end of temp
+        for (int i = 0; i < temp[temp.size() - 1].size(); i++)        // distribute colors from smallest class to the rest of the classes
         {
-            temp[i%(temp.size() - 1)].push_back(temp[temp.size() - 1][i]);
+            temp[i % (temp.size() - 1)].push_back(temp[temp.size() - 1][i]);
         }
-        temp.pop_back();
+        temp.pop_back(); // delete last class
         r = tabu_search(G, greedy_count, temp, 7, number_of_neighbours, number_of_iterations);
         if (!r.empty())
         {
@@ -177,10 +181,7 @@ int main(int argc, char *argv[])
         }
     }
 
-
-
-
-    //f << "Best solution found for k = " << sol.size() << "\n";
+    // f << "Best solution found for k = " << sol.size() << "\n";
 
     // for (int i = 0; i < sol.size(); i++)
     // {
@@ -201,20 +202,20 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-    // for (int i = G.get_size() - 1; i >= k; i--)
-    // {
-    //     std::cout << i << std::endl;
-    //     r = tabu_search(G, i, propose_solution(G, i), 7, 50, 20000);
-    //     if (!r.empty())
-    //     {
-    //         best_solution_size = r.size();
-    //         sol = r;
-    //     }
-    //     else
-    //     {
-    //         break;
-    //     }
-    // }
+// for (int i = G.get_size() - 1; i >= k; i--)
+// {
+//     std::cout << i << std::endl;
+//     r = tabu_search(G, i, propose_solution(G, i), 7, 50, 20000);
+//     if (!r.empty())
+//     {
+//         best_solution_size = r.size();
+//         sol = r;
+//     }
+//     else
+//     {
+//         break;
+//     }
+// }
 
-    // if (!sol.empty())
-    // {
+// if (!sol.empty())
+// {
