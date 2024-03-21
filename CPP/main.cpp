@@ -94,31 +94,21 @@ std::vector<std::vector<int>> greedy_coloring(MatrixGraph &G)
 
 int main(int argc, char *argv[])
 {
-    // int k = 5;
-    // if (argc > 1)
-    // {
-    //     k = std::atoi(argv[1]);
-    // }
-    // printf("%d\n", argc);
     std::string file_path = "../instances/mycie14.txt";
     int number_of_neighbours = 50;
     int number_of_iterations = 500000;
     if (argc == 2)
     {
         file_path = argv[1];
-        // printf("%d\n", argc);
     }
     else if (argc == 4)
     {
         file_path = argv[1];
         number_of_neighbours = std::atoi(argv[2]);
         number_of_iterations = std::atoi(argv[3]);
-        // printf("%d\n", argc);
     }
 
-    // printf("%d\n", argc);
     MatrixGraph G = MatrixGraph::get_graph_from_instance_file(file_path, false);
-    // G.print_graph_to_file();
 
     std::string f_out;
     bool double_dot_found = false;
@@ -149,14 +139,25 @@ int main(int argc, char *argv[])
 
     std::vector<std::vector<int>> r;
     std::vector<std::vector<int>> sol = greedy_coloring(G);
+    std::vector<std::vector<int>> best_shared = sol;
 
-    // f.open(f_out);                  // Print greedy solution
     print_sol_to_file(sol, f);
     f.close();
 
-    // auto start = std::chrono::high_resolution_clock::now();
-    for (int greedy_count = sol.size() - 1; greedy_count > 1; greedy_count--)
+    bool omp_brake = false;
+
+    std::vector<std::vector<std::vector<int>>> best_solutions(omp_get_max_threads());
+
+    int greedy_count;
+// auto start = std::chrono::high_resolution_clock::now();
+#pragma omp parallel default(none) firstprivate(omp_brake, G, number_of_neighbours, number_of_iterations, sol) private(greedy_count, r) shared(best_solutions)
+    for (greedy_count = sol.size() - 1; greedy_count > 1; greedy_count--)
     {
+        if (omp_brake)
+        {
+            continue;
+        }
+
         auto temp = sol;
         auto min = std::min_element(temp.begin(), temp.end(), [](const auto &a, const auto &b)
                                     { return a.size() < b.size(); }); // Find the smallest colour class
@@ -170,52 +171,27 @@ int main(int argc, char *argv[])
         if (!r.empty())
         {
             sol = r;
-            f.open(f_out);
-            print_sol_to_file(sol, f);
-            f.close();
-            std::cout << greedy_count << std::endl;
+            best_solutions[omp_get_thread_num()] = sol;
+            printf("[TID: %d] %d\n", omp_get_thread_num(), greedy_count);
         }
         else
         {
-            break;
+            omp_brake = true;
         }
     }
 
-    // f << "Best solution found for k = " << sol.size() << "\n";
+    std::vector<std::vector<int>> best = best_solutions[0];
+    for (auto sol : best_solutions)
+    {
+        if (sol.size() < best.size())
+        {
+            best = sol;
+        }
+    }
+    printf("Best solution size: %ld\n.", best.size());
+    f.open(f_out);
+    print_sol_to_file(best, f);
+    f.close();
 
-    // for (int i = 0; i < sol.size(); i++)
-    // {
-    //     std::cout << i << ": ";
-    //     for (auto v : sol.at(i))
-    //     {
-    //         std::cout << v << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
-    // std::cout << "Best solution found for k = " << sol.size() << std::endl;
-
-    // }
-    // else
-    // {
-    //     std::cout << "No solution found" << std::endl;
-    // }
     return 0;
 }
-
-// for (int i = G.get_size() - 1; i >= k; i--)
-// {
-//     std::cout << i << std::endl;
-//     r = tabu_search(G, i, propose_solution(G, i), 7, 50, 20000);
-//     if (!r.empty())
-//     {
-//         best_solution_size = r.size();
-//         sol = r;
-//     }
-//     else
-//     {
-//         break;
-//     }
-// }
-
-// if (!sol.empty())
-// {
