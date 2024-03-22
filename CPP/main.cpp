@@ -92,37 +92,6 @@ std::vector<std::vector<int>> greedy_coloring(MatrixGraph &G)
     return std::vector<std::vector<int>>(colours.begin(), colours.begin() + greedy_coloring_count);
 }
 
-// std::string prepare_out_path(std::string file_path)
-// {
-//     // std::string f_out;
-//     // bool double_dot_found = false;
-//     // for (size_t i = 0; i < file_path.length() - 1; i++)
-//     // {
-//     //     if (file_path[i] != '.')
-//     //     {
-//     //         f_out += file_path[i];
-//     //         double_dot_found = false;
-//     //     }
-//     //     else if (file_path[i + 1] == '.')
-//     //     {
-//     //         f_out += file_path[i];
-//     //         double_dot_found = true;
-//     //     }
-//     //     else
-//     //     {
-//     //         if (double_dot_found)
-//     //         {
-//     //             f_out += file_path[i];
-//     //             continue;
-//     //         }
-//     //         break;
-//     //     }
-//     // }
-//     // f_out += "_out.txt";
-//     std = file_path.substr(0, file_path.find_last_of('.'));
-//     return f_out;
-// }
-
 int main(int argc, char *argv[])
 {
     std::string file_path = "../instances/mycie14.txt";
