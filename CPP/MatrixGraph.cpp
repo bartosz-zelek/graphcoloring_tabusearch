@@ -9,13 +9,14 @@ using namespace std;
 
 MatrixGraph::MatrixGraph(unsigned int n) : v(n, vector<int>(n, 0)) {}
 
-void MatrixGraph::add_edge(unsigned int row, unsigned int col){
+void MatrixGraph::add_edge(unsigned int row, unsigned int col)
+{
     assert(("Row == Col - you probably don't wanna do that", row != col));
     assert(("Row or Col out of bounds", row < v.size() && col < v.size()));
-    //assert(("Edge already exists", !v[row][col]));
+    // assert(("Edge already exists", !v[row][col]));
     if (v[row][col])
     {
-        cout << "Edge already exists" << endl;
+        // cout << "Edge already exists" << endl;
         return;
     }
 
@@ -24,11 +25,12 @@ void MatrixGraph::add_edge(unsigned int row, unsigned int col){
     edge_count++;
 }
 
-vector<int> MatrixGraph::get_neighbours(unsigned int node){
+vector<int> MatrixGraph::get_neighbours(unsigned int node)
+{
     assert(("Node out of bounds", node < v.size()));
     vector<int> res;
 
-    for (int i = 0; i < v.size(); i++)
+    for (size_t i = 0; i < v.size(); i++)
     {
         if (v[node][i])
         {
@@ -38,13 +40,15 @@ vector<int> MatrixGraph::get_neighbours(unsigned int node){
     return res;
 }
 
-unsigned int MatrixGraph::get_size(){
+unsigned int MatrixGraph::get_size()
+{
     return v.size();
 }
 
-MatrixGraph MatrixGraph::get_graph_from_instance_file(const string &file_name, bool indexed_from_zero){
+MatrixGraph MatrixGraph::get_graph_from_instance_file(const string &file_name, bool indexed_from_zero)
+{
     ifstream file(file_name);
-    assert(("File not found",file.is_open()));
+    assert(("File not found", file.is_open()));
     int size;
     file >> size;
     MatrixGraph g(size);
@@ -67,11 +71,12 @@ MatrixGraph MatrixGraph::get_graph_from_instance_file(const string &file_name, b
     return g;
 }
 
-void MatrixGraph::print_graph_to_file(const string file_name){
+void MatrixGraph::print_graph_to_file(const string file_name)
+{
     ofstream file(file_name);
-    for (int i = 0; i < get_size(); i++)
+    for (size_t i = 0; i < get_size(); i++)
     {
-        for (int j = 0; j < get_size(); j++)
+        for (size_t j = 0; j < get_size(); j++)
         {
             file << v[i][j] << " ";
         }

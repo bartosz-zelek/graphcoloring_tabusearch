@@ -15,7 +15,7 @@ std::vector<std::vector<int>> propose_solution(MatrixGraph G, int k)
     {
         r[i].push_back(i);
     }
-    for (int i = k - 1; i < G.get_size(); i++)
+    for (size_t i = k - 1; i < G.get_size(); i++)
     {
         r[k - 1].push_back(i);
     }
@@ -24,7 +24,7 @@ std::vector<std::vector<int>> propose_solution(MatrixGraph G, int k)
 
 void print_sol_to_file(std::vector<std::vector<int>> &sol, std::ostream &f)
 {
-    for (int i = 0; i < sol.size(); i++)
+    for (size_t i = 0; i < sol.size(); i++)
     {
         f << i << ": ";
         for (auto v : sol.at(i))
@@ -42,7 +42,7 @@ std::vector<std::vector<int>> greedy_coloring(MatrixGraph &G)
     std::vector<unsigned int> nodes_degrees(g_size);
     std::vector<int> nodes(g_size);
     std::iota(nodes.begin(), nodes.end(), 0);
-    for (int i = 0; i < g_size; i++)
+    for (size_t i = 0; i < g_size; i++)
     {
         nodes_degrees[i] = G.get_neighbours(i).size();
     }
@@ -53,7 +53,7 @@ std::vector<std::vector<int>> greedy_coloring(MatrixGraph &G)
     int greedy_coloring_count = 0;
     for (int i : nodes)
     {
-        for (int j = 0; j < g_size; j++)
+        for (size_t j = 0; j < g_size; j++)
         {
             bool cant_assign_colour = false;
             if (colours[j].empty()) // No node has that colour
@@ -65,7 +65,7 @@ std::vector<std::vector<int>> greedy_coloring(MatrixGraph &G)
             }
             else // There are nodes with the same colour so we check if we can assign j-th colour
             {
-                for (int k = 0; k < colours[j].size(); k++)
+                for (size_t k = 0; k < colours[j].size(); k++)
                 {
                     if (G.edge_exists(i, colours[j][k]))
                     {
@@ -92,6 +92,37 @@ std::vector<std::vector<int>> greedy_coloring(MatrixGraph &G)
     return std::vector<std::vector<int>>(colours.begin(), colours.begin() + greedy_coloring_count);
 }
 
+// std::string prepare_out_path(std::string file_path)
+// {
+//     // std::string f_out;
+//     // bool double_dot_found = false;
+//     // for (size_t i = 0; i < file_path.length() - 1; i++)
+//     // {
+//     //     if (file_path[i] != '.')
+//     //     {
+//     //         f_out += file_path[i];
+//     //         double_dot_found = false;
+//     //     }
+//     //     else if (file_path[i + 1] == '.')
+//     //     {
+//     //         f_out += file_path[i];
+//     //         double_dot_found = true;
+//     //     }
+//     //     else
+//     //     {
+//     //         if (double_dot_found)
+//     //         {
+//     //             f_out += file_path[i];
+//     //             continue;
+//     //         }
+//     //         break;
+//     //     }
+//     // }
+//     // f_out += "_out.txt";
+//     std = file_path.substr(0, file_path.find_last_of('.'));
+//     return f_out;
+// }
+
 int main(int argc, char *argv[])
 {
     std::string file_path = "../instances/mycie14.txt";
@@ -110,31 +141,8 @@ int main(int argc, char *argv[])
 
     MatrixGraph G = MatrixGraph::get_graph_from_instance_file(file_path, false);
 
-    std::string f_out;
-    bool double_dot_found = false;
-    for (int i = 0; i < file_path.length() - 1; i++)
-    {
-        if (file_path[i] != '.')
-        {
-            f_out += file_path[i];
-            double_dot_found = false;
-        }
-        else if (file_path[i + 1] == '.')
-        {
-            f_out += file_path[i];
-            double_dot_found = true;
-        }
-        else
-        {
-            if (double_dot_found)
-            {
-                f_out += file_path[i];
-                continue;
-            }
-            break;
-        }
-    }
-    f_out += "_out.txt";
+    std::string f_out = file_path.substr(0, file_path.find_last_of('.')) + "_out.txt";
+
     std::ofstream f(f_out);
 
     std::vector<std::vector<int>> r;
@@ -162,7 +170,7 @@ int main(int argc, char *argv[])
         auto min = std::min_element(temp.begin(), temp.end(), [](const auto &a, const auto &b)
                                     { return a.size() < b.size(); }); // Find the smallest colour class
         std::iter_swap(min, temp.end() - 1);                          // smallest colour class goes at the end of temp
-        for (int i = 0; i < temp[temp.size() - 1].size(); i++)        // distribute colors from smallest class to the rest of the classes
+        for (size_t i = 0; i < temp[temp.size() - 1].size(); i++)     // distribute colors from smallest class to the rest of the classes
         {
             temp[i % (temp.size() - 1)].push_back(temp[temp.size() - 1][i]);
         }
@@ -188,7 +196,7 @@ int main(int argc, char *argv[])
             best = sol;
         }
     }
-    printf("Best solution size: %ld\n.", best.size());
+    printf("Best solution size: %lld\n.", best.size());
     f.open(f_out);
     print_sol_to_file(best, f);
     f.close();

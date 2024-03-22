@@ -2,9 +2,8 @@
 #include <algorithm>
 std::vector<Conflict> how_many_conflicts(const MatrixGraph &G, const std::vector<std::vector<int>> &solution)
 {
-    int result = 0;
     std::vector<Conflict> conflicts;
-    for (int i = 0; i < solution.size(); i++)
+    for (size_t i = 0; i < solution.size(); i++)
     {
         const auto &x = solution[i];
         for (int y : x)
@@ -17,7 +16,7 @@ std::vector<Conflict> how_many_conflicts(const MatrixGraph &G, const std::vector
                     {
                         conflicts.push_back(
                             {{y, z},
-                             i});
+                             static_cast<int>(i)});
                     }
                 }
             }
@@ -26,7 +25,7 @@ std::vector<Conflict> how_many_conflicts(const MatrixGraph &G, const std::vector
     return conflicts;
 }
 
-std::vector<std::vector<int>> tabu_search(MatrixGraph G, int k_number_of_colours, std::vector<std::vector<int>> solution, int tabu_size, int number_of_neighbours, int max_iterations)
+std::vector<std::vector<int>> tabu_search(MatrixGraph G, int k_number_of_colours, std::vector<std::vector<int>> solution, size_t tabu_size, int number_of_neighbours, int max_iterations)
 {
     int current_iteration = 0;
     std::deque<std::pair<int, int>> tabu;
@@ -46,12 +45,11 @@ std::vector<std::vector<int>> tabu_search(MatrixGraph G, int k_number_of_colours
         bool so_far_best_solution_found = false;
         if (tabu.size() > tabu_size)
         {
-            // tabu.erase(std::remove(tabu.begin(), tabu.end(), tabu[0]), tabu.end());
             tabu.pop_back();
         }
 
         std::vector<std::vector<int>> best_proposed_solution;
-        int best_conflicts_count;
+        size_t best_conflicts_count;
         std::pair<int, int> move{0, 0};
         bool is_any_solution_found = false;
         bool in_tabu;
@@ -122,7 +120,7 @@ std::vector<std::vector<int>> tabu_search(MatrixGraph G, int k_number_of_colours
         if (!so_far_best_solution_found)
         {
             tabu.push_front(move);
-            solution = best_proposed_solution; // Todo - best proposed solutions conflicts, optymalizacja
+            solution = best_proposed_solution;
         }
     }
 
