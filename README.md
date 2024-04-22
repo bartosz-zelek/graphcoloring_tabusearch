@@ -1,4 +1,4 @@
-## Optymalizacja kombinatoryczna — projekt
+## Przetwarzanie równoległe — projekt
 Problem kolorowania grafu + metaheurystyka.
 
-*tworzą: bartek i serdeczny kolega kuba*
+Modyfikacja projektu z optymalizacji kombinatorycznej.
