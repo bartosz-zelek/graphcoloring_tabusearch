@@ -3,9 +3,6 @@
 **Description:**
 A graph coloring algorithm using the Tabu Search metaheuristic implemented with OpenMP for parallel execution.
 
-**Repository:**
-[graphcoloring_tabusearch](https://github.com/bartox7777/graphcoloring_tabusearch/tree/main/CPP)
-
 #### **Algorithm Overview**
 
 - Starts with greedy coloring.
